@@ -1,24 +1,33 @@
-name: Deploy to AWS
+name: Deploy Docker Compose
 
 on:
   push:
     branches:
-      - main 
+      - main
 
 jobs:
   deploy:
-    runs-on: [self-hosted] 
+    runs-on: [self-hosted]
+
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Load .env File
-        run: |
-          set -o allexport
-          source .env
-          set +o allexport
+    - name: Set environment variables
+      run: |
+        echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> $GITHUB_ENV
+        echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}" >> $GITHUB_ENV
+        echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" >> $GITHUB_ENV
+        echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> $GITHUB_ENV
+        echo "HOST=${{ secrets.HOST }}" >> $GITHUB_ENV
+        echo "PORT=${{ secrets.PORT }}" >> $GITHUB_ENV
 
-      - name: Deploy Docker Compose
+      - name: Run Docker Compose
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
         run: |
-          docker-compose down  
-          docker-compose up -d --build
+          docker-compose down
+          docker-compose up -d
