@@ -12,6 +12,12 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      - name: Load .env File
+        run: |
+          set -o allexport
+          source .env
+          set +o allexport
+
       - name: Deploy Docker Compose
         run: |
           docker-compose down  
